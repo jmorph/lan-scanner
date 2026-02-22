@@ -1,0 +1,18 @@
+# Binaries
+/bin/
+/obj/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Output files
+/output/
+*.log
+
+# Go build
+*.test
+*.out
+
+# VS Code
+.vscode/
