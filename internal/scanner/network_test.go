@@ -27,7 +27,7 @@ func TestPingIP_Success(t *testing.T) {
 
 	scanner := NewTCPPortCheckerWithDial(mockDial)
 
-	result := scanner.TCPPing("192.168.1.100", 100*time.Millisecond)
+	result := scanner.Ping("192.168.1.100", 100*time.Millisecond)
 
 	if !result {
 		t.Errorf("expected true, got false")
@@ -41,7 +41,7 @@ func TestPingIP_Failure(t *testing.T) {
 
 	scanner := NewTCPPortCheckerWithDial(mockDial)
 
-	result := scanner.TCPPing("192.168.1.100", 100*time.Millisecond)
+	result := scanner.Ping("192.168.1.100", 100*time.Millisecond)
 
 	if result {
 		t.Errorf("expected false, got true")

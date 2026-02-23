@@ -7,12 +7,12 @@ import (
 	"regexp"
 )
 
-// abstracts command execution
+/******** Command Execution ********/
+
 type CommandRunner interface {
 	Run(name string, args ...string) (io.ReadCloser, error)
 }
 
-// executes real OS commands
 type DefaultRunner struct{}
 
 func (d DefaultRunner) Run(name string, args ...string) (io.ReadCloser, error) {
@@ -27,19 +27,18 @@ func (d DefaultRunner) Run(name string, args ...string) (io.ReadCloser, error) {
 	return stdout, nil
 }
 
-// ARPScanner handles ARP table retrieval
+/******** ARP Scanner ********/
+
 type ARPScanner struct {
 	runner CommandRunner
 }
 
-// NewARPScanner creates scanner with default runner
 func NewARPScanner() *ARPScanner {
 	return &ARPScanner{
 		runner: DefaultRunner{},
 	}
 }
 
-// GetARPTable fetches and parses ARP entries
 func (a *ARPScanner) GetARPTable() (map[string]string, error) {
 	stdout, err := a.runner.Run("arp", "-n")
 	if err != nil {
@@ -50,7 +49,14 @@ func (a *ARPScanner) GetARPTable() (map[string]string, error) {
 	return parseARP(stdout), nil
 }
 
-// parseARP parses ARP table from reader
+/******** Package-Level Helper ********/
+
+func GetARPTable() (map[string]string, error) {
+	return NewARPScanner().GetARPTable()
+}
+
+/******** Parsing ********/
+
 func parseARP(r io.Reader) map[string]string {
 	arpMap := make(map[string]string)
 	scanner := bufio.NewScanner(r)
@@ -58,8 +64,7 @@ func parseARP(r io.Reader) map[string]string {
 	re := regexp.MustCompile(`(\d+\.\d+\.\d+\.\d+)\s+.*\s+([0-9a-f:]{17})`)
 
 	for scanner.Scan() {
-		line := scanner.Text()
-		matches := re.FindStringSubmatch(line)
+		matches := re.FindStringSubmatch(scanner.Text())
 		if len(matches) == 3 {
 			arpMap[matches[1]] = matches[2]
 		}
